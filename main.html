@@ -35,71 +35,35 @@
   </div>
 
 <script>
-//Your code goes here 
-	let startX = 0;
-let cubeBeingDragged = null;
+	const slider = document.querySelector('.items');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
 
-const cubes = document.querySelectorAll('.cube');
+    slider.addEventListener('mousedown', (event) => {
+        isDown = true;
+        slider.classList.add('active')
+        startX = event.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+    });
+    
+    slider.addEventListener('mouseleave', () => {
+        isDown = false;
+        slider.classList.remove('active')
+    });
 
-cubes.forEach((cube) => {
-  cube.addEventListener('mousedown', (e) => {
-    startX = e.clientX;
-    cubeBeingDragged = cube;
-    cube.classList.add('dragging');
-  });
+    slider.addEventListener('mouseup', () => {
+        isDown = false;
+        slider.classList.remove('active')
+    });
 
-  cube.addEventListener('mousemove', (e) => {
-    if (cubeBeingDragged === cube) {
-      const moveX = e.clientX - startX;
-      cube.style.transform = `translateX(${moveX}px)`;
-    }
-  });
-
-  cube.addEventListener('mouseup', () => {
-    if (cubeBeingDragged === cube) {
-      cube.style.transform = 'translateX(0)';
-      cube.classList.remove('dragging');
-
-      // Determine the direction of the drag
-      const endX = event.clientX;
-      const index = parseInt(cube.dataset.index);
-      if (endX - startX > 50 && index > 1) {
-        // Slide left
-        slideCube(index, index - 1);
-      } else if (startX - endX > 50 && index < 6) {
-        // Slide right
-        slideCube(index, index + 1);
-      }
-
-      cubeBeingDragged = null;
-    }
-  });
-
-  cube.addEventListener('mouseleave', () => {
-    if (cubeBeingDragged === cube) {
-      cube.style.transform = 'translateX(0)';
-      cube.classList.remove('dragging');
-      cubeBeingDragged = null;
-    }
-  });
-});
-
-function slideCube(fromIndex, toIndex) {
-  const fromCube = document.querySelector(`[data-index="${fromIndex}"]`);
-  const toCube = document.querySelector(`[data-index="${toIndex}"]`);
-  
-  if (fromCube && toCube) {
-    // Swap the data-index values to maintain the order
-    fromCube.dataset.index = toIndex;
-    toCube.dataset.index = fromIndex;
-
-    // Swap the cube positions
-    const fromTransform = getComputedStyle(fromCube).transform;
-    const toTransform = getComputedStyle(toCube).transform;
-    fromCube.style.transform = toTransform;
-    toCube.style.transform = fromTransform;
-  }
-}
+    slider.addEventListener('mousemove', (event) => {
+        if (!isDown) return;
+        event.preventDefault();
+        const x = event.pageX - slider.offsetLeft;
+        const walk = (x - startX)*2;
+        slider.scrollLeft = scrollLeft - walk;
+    });
 
 </script>
 
